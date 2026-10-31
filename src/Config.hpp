@@ -15,6 +15,7 @@ struct Stop {
 namespace cfg {
     // index 0 = Player 1, 1 = Player 2
     inline std::vector<Stop> g_stops[2];
+    inline bool g_enabled = true;
 
     inline std::string toHex(ccColor3B c) {
         return fmt::format("{:02X}{:02X}{:02X}", c.r, c.g, c.b);
@@ -64,11 +65,13 @@ namespace cfg {
     }
 
     inline void load() {
+        g_enabled = Mod::get()->getSavedValue<bool>("enabled", true);
         g_stops[0] = parse(Mod::get()->getSavedValue<std::string>("p1-stops", ""));
         g_stops[1] = parse(Mod::get()->getSavedValue<std::string>("p2-stops", ""));
     }
 
     inline void save() {
+        Mod::get()->setSavedValue<bool>("enabled", g_enabled);
         Mod::get()->setSavedValue<std::string>("p1-stops", serialize(g_stops[0]));
         Mod::get()->setSavedValue<std::string>("p2-stops", serialize(g_stops[1]));
         (void)Mod::get()->saveData();
@@ -77,6 +80,7 @@ namespace cfg {
     // Color for a given percent. nullopt = before the first stop -> keep the game's own (icon) color.
     inline std::optional<ccColor3B> colorAt(int player, float percent) {
         std::optional<ccColor3B> result;
+        if (!g_enabled) return result;
         for (auto const& s : g_stops[player]) {
             if (s.at <= percent) result = s.color;
             else break;

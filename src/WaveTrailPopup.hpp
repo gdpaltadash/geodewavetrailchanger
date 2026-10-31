@@ -4,6 +4,7 @@
 class WaveTrailPopup : public geode::Popup {
 protected:
     std::vector<Stop> m_stops[2];
+    bool m_enabled = true;
     int m_player = 0;
     ScrollLayer* m_scroll = nullptr;
     CCLabelBMFont* m_playerLabel = nullptr;
